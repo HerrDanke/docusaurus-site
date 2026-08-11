@@ -189,6 +189,9 @@ const config = {
         path: path.resolve(VAULT, 'Assets'),
         routeBasePath: 'Assets',
         sidebarPath: './sidebars-assets.js',
+        // catalog/ 是 ai-assets 展示站（8083）的内容源，不在本知识库站展示。
+        // exclude 后文档页、落地页卡片、搜索索引一并排除
+        exclude: ['catalog/**'],
         showLastUpdateTime: false,
         showLastUpdateAuthor: false,
       },
