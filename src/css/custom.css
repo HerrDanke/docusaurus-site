@@ -1,0 +1,28 @@
+/**
+ * ObsidiaNote 主题覆盖：Apple 风格主色，贴近现有 Docsify 站
+ */
+:root {
+  --ifm-color-primary: #007AFF;
+  --ifm-color-primary-dark: #0066D6;
+  --ifm-color-primary-darker: #0052B0;
+  --ifm-color-primary-darkest: #003E85;
+  --ifm-color-primary-light: #2E8DFF;
+  --ifm-color-primary-lighter: #5CA6FF;
+  --ifm-color-primary-lightest: #8AC0FF;
+  --ifm-code-font-size: 95%;
+  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --ifm-font-family-monospace: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+  --ifm-heading-font-weight: 650;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #0A84FF;
+  --ifm-color-primary-dark: #0871DB;
+  --ifm-color-primary-darker: #065FB8;
+  --ifm-color-primary-darkest: #044D94;
+  --ifm-color-primary-light: #2D92FF;
+  --ifm-color-primary-lighter: #5AA9FF;
+  --ifm-color-primary-lightest: #87C0FF;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
