@@ -185,6 +185,17 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: 'starred',
+        path: path.resolve(VAULT, 'starred'),
+        routeBasePath: 'starred',
+        sidebarPath: './sidebars-starred.js',
+        showLastUpdateTime: false,
+        showLastUpdateAuthor: false,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: 'assets',
         path: path.resolve(VAULT, 'Assets'),
         routeBasePath: 'Assets',
@@ -213,7 +224,7 @@ const config = {
           srcDark: 'img/logo-dark.svg',
         },
         items: [
-          { to: '/Tech/Tools/starred-repos', label: '⭐ 标星', position: 'left' },
+          { to: '/starred/starred-repos', label: '⭐ 标星', position: 'left' },
           { type: 'docSidebar', sidebarId: 'tech', label: 'Tech', position: 'left', docsPluginId: 'tech' },
           { type: 'docSidebar', sidebarId: 'assets', label: 'Assets', position: 'left', docsPluginId: 'assets' },
         ],
