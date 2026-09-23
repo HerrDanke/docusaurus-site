@@ -43,7 +43,7 @@ npm run serve
 
 ## 部署
 
-- `/usr/local/sbin/docusaurus-deploy.sh`：`git fetch → ff-only merge`（vault）→ `npm ci && npm run build` → 校验产物。
+- 部署脚本：本仓库 [`deploy/docusaurus-deploy.sh`](./deploy/docusaurus-deploy.sh) 纳管（`/usr/local/sbin/docusaurus-deploy.sh` 是指向它的软链）：`git fetch → ff-only merge`（vault + 本仓库）→ `npm ci && npm run build` → 校验产物。
 - systemd `docusaurus-deploy.timer`：每 5 分钟触发，与 ai-assets-site 部署共享 `/run/vault-deploy.lock` 串行化 git 操作；以 vault HEAD 状态文件做增量，内容无更新时跳过构建。（原 Docsify 的 `obsidia-deploy.timer` 已于切换时退役。）
 
 ## 评估结论
