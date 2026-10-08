@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # 部署 ObsidiaNote vault → Docusaurus 正式站 (8081)
 # 每 5 分钟由 systemd timer 触发：git fetch → ff-only merge → npm ci + build
-# 与 obsidia/ai-assets-deploy 共享 /run/vault-deploy.lock，串行化对 vault 的 git 操作
+# 与 ai-assets-deploy 共享 /run/vault-deploy.lock，串行化对 vault 的 git 操作
 set -euo pipefail
 
-# 与另两个部署共享锁，防 index.lock 冲突与混合快照读
+# 与 ai-assets-deploy.sh 共享锁，防 index.lock 冲突与混合快照读
 exec 9>/run/vault-deploy.lock
 flock 9
 
