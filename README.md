@@ -46,6 +46,29 @@ npm run serve
 - 部署脚本：本仓库 [`deploy/docusaurus-deploy.sh`](./deploy/docusaurus-deploy.sh) 纳管（`/usr/local/sbin/docusaurus-deploy.sh` 是指向它的软链）：`git fetch → ff-only merge`（vault + 本仓库）→ `npm ci && npm run build` → 校验产物。
 - systemd `docusaurus-deploy.timer`：每 5 分钟触发，与 ai-assets-site 部署共享 `/run/vault-deploy.lock` 串行化 git 操作；以 vault HEAD 状态文件做增量，内容无更新时跳过构建。（原 Docsify 的 `obsidia-deploy.timer` 已于切换时退役。）
 
+### systemd 单元配置说明
+
+`docusaurus-deploy.service` 是 `Type=oneshot` 的一次性构建任务（**不是常驻服务**），由 timer 驱动。以下几点容易踩坑，记录备查：
+
+| 配置 | 作用 | 注意 |
+|---|---|---|
+| `Restart=on-failure` + `RestartSec=60s` | 构建失败（非 0 退出）60 秒后重试 | oneshot 成功后即结束，**不会**被反复拉起；只有失败才重试 |
+| `TimeoutStartSec=1800` | 单次构建最长 30 分钟 | 超时按失败处理并触发重试 |
+| `StartLimitIntervalSec=1800` + `StartLimitBurst=3` | 30 分钟内失败 3 次即锁定 | **必须写在 `[Unit]`，不是 `[Service]`**；写在 `[Service]` 会被 systemd 静默忽略，限流失效且不报错 |
+| `OnBootSec=2min`（timer） | 开机后 2 分钟补一次构建 | 状态文件在 `/run/docusaurus-deployed.sha`，重启后丢失，**开机首次必做全量构建**（`npm ci` + `build`） |
+| `Persistent=true`（timer） | 关机期间错过的触发会在开机后补跑 | 与 `OnBootSec` 配合，保证开机即同步 |
+
+**开机自启**由 `systemctl enable docusaurus-deploy.timer` 承担（service 本身是 `static`，不需要 enable）。
+
+失败锁定后需人工介入恢复：
+
+```bash
+systemctl status docusaurus-deploy.service     # 查看失败原因
+systemctl reset-failed docusaurus-deploy.service
+```
+
+> 限流是刻意设计：若 vault 出现 git 分叉或 `npm ci` 网络失败，无限重试只会每 5 分钟刷日志、空耗 CPU。脚本日志会明确提示「可能分叉，请手动处理」。
+
 ## 评估结论
 
 迁移可行性评估详见 [`EVALUATION.md`](./EVALUATION.md)。
