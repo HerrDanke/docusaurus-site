@@ -92,9 +92,14 @@ systemctl reset-failed docusaurus-deploy.service
   > 的那个组件的 JSX 上最稳。
 - **`src/css/custom.css`** 的 `.doc-wide-page` 段：
   - `table { display:table; table-layout:fixed; width:100% }` —— 列宽由 `th` 宽度决定，不被超长文本撑开；
-  - 列宽**按列数用 `:has()` 区分**，不能用 `nth-child` 盲设：标星表 3 列（仓库|描述|⭐）、
-    软件清单表 5 列（软件|版本|来源|官方链接|说明）。曾把 `nth-child(2)` 设成 `nowrap`，
-    结果标星表的「描述」列拒绝换行、整表 2199px，页面被撑到 2515px 要横向拖；
+  - 列宽**只能按「表头是什么」区分，不能按列数**：页面里目录表（分类|数量|说明）和仓库表
+    （仓库|描述|⭐）**都是 3 列**，按列数写规则会让目录表吃到仓库表的样式——实测「数量」列被
+    拉到 443px、「说明」挤成 96px，目录行高 184px，看起来极不协调。现在用表格形状区分：
+    目录表 = 单元格里有 `a[href^='#']` 锚点（`table-layout:auto` + 数量列 5rem 居中）；
+    仓库表 = 4 列以下且第 3 列是表头末列（仓库 22% / ⭐ 6rem 右对齐）；
+    软件表 = 5 列（9/6.75/8/8 rem + 说明 auto）。
+    更早还犯过按 `nth-child` 盲设 `nowrap` 的错：仓库表「描述」列拒绝换行、整表 2199px，
+    页面被撑到 2515px 要横向拖；
   - 5 列表用 rem 固定前四列（软件名 15rem / 版本 7.5rem / 来源 7.5rem / 链接 8.5rem），
     用百分比会裁掉长软件名（`Windows Subsystem for Linux`）；说明列 `width:auto` 吃剩余；
   - `@media (max-width:996px)` 下 `table { display:block; overflow-x:auto }`，
