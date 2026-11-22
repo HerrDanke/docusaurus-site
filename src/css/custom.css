@@ -31,33 +31,51 @@
    背景：vault 里的清单页（/starred/*）由 markdown 生成，原始 <table> 没有 wrapper；
    Docusaurus 默认 .markdown table 是 display:block + overflow:auto，列宽被压到
    min-content，「下载 · 官网」两个链接于是各自折行、整张表拉成竖条。
-   这里把 table 还原成真正的表格：撑满列宽、链接列不折行、窄屏自身横向滚动。
-   只在 starred 实例生效（class 由 src/theme/DocItem/Layout 挂）。 */
+   这里把 table 还原成真正的表格，并**按列数**（而不是 nth-child 位置）控制列宽——
+   标星表是 3 列（仓库|描述|⭐）、软件清单表是 5 列（软件|版本|来源|官方链接|说明），
+   用位置选择器会串页（曾把标星表的「描述」列设成 nowrap，整页被撑到 2515px 要横向拖）。
+   只对 starred 实例生效（class 由 src/theme/DocItem/Content 挂）。 */
 .doc-wide-page table {
   display: table;
   width: 100%;
+  table-layout: fixed;   /* 列宽由下面第 1 行的 width 决定，不被超长文本撑开 */
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 .doc-wide-page table thead tr {
   border-bottom: 2px solid var(--ifm-table-border-color);
 }
-
-/* 软件清单表列宽：链接列不许折行，说明列吃掉剩余空间 */
 .doc-wide-page table th,
 .doc-wide-page table td {
   vertical-align: top;
+  overflow-wrap: anywhere;  /* 长 URL / 长英文串也能在窄屏断行 */
 }
-.doc-wide-page table th:nth-child(1),
-.doc-wide-page table td:nth-child(1) { white-space: nowrap; }   /* 软件名 */
-.doc-wide-page table th:nth-child(2),
-.doc-wide-page table td:nth-child(2) { white-space: nowrap; }   /* 版本 */
-.doc-wide-page table th:nth-child(3),
-.doc-wide-page table td:nth-child(3) { white-space: nowrap; }   /* 来源 */
-.doc-wide-page table th:nth-child(4),
-.doc-wide-page table td:nth-child(4) { white-space: nowrap; }   /* 官方链接：下载 · 官网 同一行 */
-.doc-wide-page table th:nth-child(4) { min-width: 11.5rem; }
-.doc-wide-page table th:nth-child(5) { min-width: 18rem; }       /* 说明 */
 
-/* 列表里的「分类 | 数量 | 说明」表：说明列可换行，不必 nowrap */
-.doc-wide-page table td:nth-child(1) a { white-space: nowrap; }
+/* 3 列表：标星清单（仓库 | 描述 | ⭐）—— 描述列自适应换行，绝不 nowrap */
+.doc-wide-page table:has(thead th:nth-child(3):last-child) th:nth-child(1),
+.doc-wide-page table:has(thead th:nth-child(3):last-child) td:nth-child(1) { width: 22%; }
+.doc-wide-page table:has(thead th:nth-child(3):last-child) th:nth-child(3),
+.doc-wide-page table:has(thead th:nth-child(3):last-child) td:nth-child(3) { width: 6rem; text-align: right; }
+
+/* 5 列表：软件清单（软件 | 版本 | 来源 | 官方链接 | 说明）
+   宽度用 rem 而不是百分比：table-layout:fixed 下百分比会把长软件名（DeepSeek Harness 等）
+   裁掉。软件名/版本/来源给足内容宽度，官方链接正好容纳「下载 · 官网」一行，说明列吃掉剩余。 */
+.doc-wide-page table:has(thead th:nth-child(5)) th:nth-child(1) { width: 15rem; }
+.doc-wide-page table:has(thead th:nth-child(5)) th:nth-child(2) { width: 7.5rem; }
+.doc-wide-page table:has(thead th:nth-child(5)) th:nth-child(3) { width: 7.5rem; }
+.doc-wide-page table:has(thead th:nth-child(5)) th:nth-child(4) { width: 8.5rem; }  /* 「下载 · 官网」同一行 */
+.doc-wide-page table:has(thead th:nth-child(5)) th:nth-child(5) { width: auto; }
+/* 前四列不折行（保证链接同行），但允许在极窄屏整体横向滚动，见下方 @media */
+.doc-wide-page table:has(thead th:nth-child(5)) th:nth-child(-n+4),
+.doc-wide-page table:has(thead th:nth-child(5)) td:nth-child(-n+4) { white-space: nowrap; }
+
+/* 窄屏（手机）：固定列宽放不下时，让表格自己横向滚动，而不是把整页撑出横向滚动条。
+   table 需要 display:block 才能自身滚动；此时 table-layout:fixed + width:100% 仍生效，
+   列宽由上面的 th 宽度决定，内容不会被压成竖条。 */
+@media screen and (max-width: 996px) {
+  .doc-wide-page table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+}

@@ -90,8 +90,22 @@ systemctl reset-failed docusaurus-deploy.service
   > ② 不要在 Layout 层用 DOM 副作用加 class——React 水合会重建 article 内容，class 与任何
   > wrapper 都会丢（还容易引出 hydration mismatch）。class 直接写在渲染 `.theme-doc-markdown`
   > 的那个组件的 JSX 上最稳。
-- **`src/css/custom.css`** 的 `.doc-wide-page` 段：`table` 还原为 `display:table` 并撑满列宽，
-  第 1–4 列 `white-space:nowrap`（链接列 `min-width:11.5rem`），窄屏由 `overflow-x:auto` 横向滚动。
+- **`src/css/custom.css`** 的 `.doc-wide-page` 段：
+  - `table { display:table; table-layout:fixed; width:100% }` —— 列宽由 `th` 宽度决定，不被超长文本撑开；
+  - 列宽**按列数用 `:has()` 区分**，不能用 `nth-child` 盲设：标星表 3 列（仓库|描述|⭐）、
+    软件清单表 5 列（软件|版本|来源|官方链接|说明）。曾把 `nth-child(2)` 设成 `nowrap`，
+    结果标星表的「描述」列拒绝换行、整表 2199px，页面被撑到 2515px 要横向拖；
+  - 5 列表用 rem 固定前四列（软件名 15rem / 版本 7.5rem / 来源 7.5rem / 链接 8.5rem），
+    用百分比会裁掉长软件名（`Windows Subsystem for Linux`）；说明列 `width:auto` 吃剩余；
+  - `@media (max-width:996px)` 下 `table { display:block; overflow-x:auto }`，
+    窄屏只在表格内部横向滚动，整页不出横向滚动条。
+
+自检（浏览器控制台，两条都应为 false / 0）：
+
+```js
+document.documentElement.scrollWidth > document.documentElement.clientWidth   // 整页横向溢出
+[...document.querySelectorAll('article tbody td')].filter(td => td.scrollWidth > td.clientWidth + 1).length  // 被裁单元格
+```
 
 改完必须 `rm -rf build .docusaurus && npm run build`：chunk 文件名固定为 `17896441.<hash>`，
 增量构建时浏览器可能命中旧 chunk（曾因此误判「改动没生效」）。
