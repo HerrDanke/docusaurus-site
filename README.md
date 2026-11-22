@@ -77,3 +77,21 @@ systemctl reset-failed docusaurus-deploy.service
 
 - 个别 vault 内相对 markdown 链接（`./xxx.md`）Docusaurus 无法解析（原 Docsify 时代能），构建期告警，不影响渲染。
 - `Assets/catalog` 分类标题取自 vault 内 `catalog/README.md` 的 H1，忠实于内容。
+
+## 清单类页面的宽表格版式（2026-11-22）
+
+`/starred/*` 下的页面（标星清单、本机软件清单）是 markdown 生成的大表格，Docusaurus 默认
+`.markdown table { display:block; overflow:auto }` 会把列宽压到 min-content，导致「下载 · 官网」
+两个链接各自折行、整张表被拉成竖条。处理方式：
+
+- **`src/theme/DocItem/Content/index.js`**（`npx docusaurus swizzle @docusaurus/theme-classic DocItem/Content --eject --danger --javascript` 生成后改一处）：
+  按 `metadata.permalink` 前缀 `/starred/` 给正文容器追加 `doc-wide-page`。
+  > 两个踩过的坑：① `metadata` 在运行时**没有 `pluginId` 字段**，判断实例只能靠 permalink；
+  > ② 不要在 Layout 层用 DOM 副作用加 class——React 水合会重建 article 内容，class 与任何
+  > wrapper 都会丢（还容易引出 hydration mismatch）。class 直接写在渲染 `.theme-doc-markdown`
+  > 的那个组件的 JSX 上最稳。
+- **`src/css/custom.css`** 的 `.doc-wide-page` 段：`table` 还原为 `display:table` 并撑满列宽，
+  第 1–4 列 `white-space:nowrap`（链接列 `min-width:11.5rem`），窄屏由 `overflow-x:auto` 横向滚动。
+
+改完必须 `rm -rf build .docusaurus && npm run build`：chunk 文件名固定为 `17896441.<hash>`，
+增量构建时浏览器可能命中旧 chunk（曾因此误判「改动没生效」）。

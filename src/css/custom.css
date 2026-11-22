@@ -26,3 +26,38 @@
   --ifm-color-primary-lightest: #87C0FF;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* ===== 清单类页面的宽表格版式 =====
+   背景：vault 里的清单页（/starred/*）由 markdown 生成，原始 <table> 没有 wrapper；
+   Docusaurus 默认 .markdown table 是 display:block + overflow:auto，列宽被压到
+   min-content，「下载 · 官网」两个链接于是各自折行、整张表拉成竖条。
+   这里把 table 还原成真正的表格：撑满列宽、链接列不折行、窄屏自身横向滚动。
+   只在 starred 实例生效（class 由 src/theme/DocItem/Layout 挂）。 */
+.doc-wide-page table {
+  display: table;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.doc-wide-page table thead tr {
+  border-bottom: 2px solid var(--ifm-table-border-color);
+}
+
+/* 软件清单表列宽：链接列不许折行，说明列吃掉剩余空间 */
+.doc-wide-page table th,
+.doc-wide-page table td {
+  vertical-align: top;
+}
+.doc-wide-page table th:nth-child(1),
+.doc-wide-page table td:nth-child(1) { white-space: nowrap; }   /* 软件名 */
+.doc-wide-page table th:nth-child(2),
+.doc-wide-page table td:nth-child(2) { white-space: nowrap; }   /* 版本 */
+.doc-wide-page table th:nth-child(3),
+.doc-wide-page table td:nth-child(3) { white-space: nowrap; }   /* 来源 */
+.doc-wide-page table th:nth-child(4),
+.doc-wide-page table td:nth-child(4) { white-space: nowrap; }   /* 官方链接：下载 · 官网 同一行 */
+.doc-wide-page table th:nth-child(4) { min-width: 11.5rem; }
+.doc-wide-page table th:nth-child(5) { min-width: 18rem; }       /* 说明 */
+
+/* 列表里的「分类 | 数量 | 说明」表：说明列可换行，不必 nowrap */
+.doc-wide-page table td:nth-child(1) a { white-space: nowrap; }

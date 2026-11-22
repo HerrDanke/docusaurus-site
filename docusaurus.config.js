@@ -225,6 +225,7 @@ const config = {
         },
         items: [
           { to: '/starred/starred-repos', label: '⭐ 标星', position: 'left' },
+          { to: '/starred/software-inventory', label: '🧾 软件清单', position: 'left' },
           { type: 'docSidebar', sidebarId: 'tech', label: 'Tech', position: 'left', docsPluginId: 'tech' },
           { type: 'docSidebar', sidebarId: 'assets', label: 'Assets', position: 'left', docsPluginId: 'assets' },
         ],
