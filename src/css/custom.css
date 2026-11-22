@@ -89,15 +89,20 @@
 /* 列宽按内容实测分配（692px 表格宽度下）：
    软件名 11rem（容纳 Windows Subsystem for Linux 需 nowrap 时会被略裁，故允许 wrap 关闭 nowrap）
    版本 6.5rem / 来源 6.5rem / 官方链接 8rem（「下载 · 官网」一行）/ 说明吃掉剩余 ≈ 13rem */
-.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(1) { width: 9rem; }
-.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(2) { width: 6.75rem; }
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(1) { width: 8.5rem; }
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(2) { width: 10rem; }  /* 16.0.20625.20108 这类长版本号需 ~141px */
 .doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(3) { width: 8rem; }
 .doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(4) { width: 8rem; }
 .doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(5) { width: auto; }
-.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(n+2):nth-child(-n+4),
-.doc-wide-page table:has(> thead > tr > th:nth-child(5)) td:nth-child(n+2):nth-child(-n+4) { white-space: nowrap; }
-/* 软件名列允许折行（否则 Windows Subsystem for Linux 会被裁断） */
-.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(1) { white-space: normal; }
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(n+3):nth-child(-n+4),
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) td:nth-child(n+3):nth-child(-n+4) { white-space: nowrap; }
+/* 软件名/版本列允许折行：否则 Windows Subsystem for Linux、
+   14.0.02+ecf102c2f5ba642ec5ace5（便携版含 git 哈希）会被裁断。
+   来源列与官方链接列必须 nowrap（链接要同行）。 */
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(1),
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) td:nth-child(1),
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) th:nth-child(2),
+.doc-wide-page table:has(> thead > tr > th:nth-child(5)) td:nth-child(2) { white-space: normal; }
 
 /* 窄屏（手机）：固定列宽放不下时，让表格自己横向滚动，而不是把整页撑出横向滚动条。 */
 @media screen and (max-width: 996px) {
